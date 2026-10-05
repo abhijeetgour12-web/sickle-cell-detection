@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import requests
 import os
 
+
 # =========================================================
 # PAGE CONFIG
 # =========================================================
@@ -17,12 +18,16 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+
 # =========================================================
 # CUSTOM CSS
 # =========================================================
 
 st.markdown("""
 <style>
+
+/* Main background */
+
 .stApp {
     background:
         radial-gradient(
@@ -38,11 +43,27 @@ st.markdown("""
         #080a12;
 }
 
+
+/* Keep Streamlit toolbar icons,
+   remove black background/line */
+
+[data-testid="stHeader"] {
+    background: transparent !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+
+/* Main container */
+
 .block-container {
     max-width: 1150px;
     padding-top: 25px;
     padding-bottom: 50px;
 }
+
+
+/* Logo */
 
 .logo {
     font-size: 20px;
@@ -54,6 +75,9 @@ st.markdown("""
     color: #c084fc;
 }
 
+
+/* Hero */
+
 .hero {
     text-align: center;
     padding: 35px 10px 25px;
@@ -63,12 +87,14 @@ st.markdown("""
     font-size: 52px;
     font-weight: 850;
     margin-bottom: 12px;
+
     background: linear-gradient(
         90deg,
         #ffffff,
         #c084fc,
         #f9a8d4
     );
+
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -81,12 +107,18 @@ st.markdown("""
     line-height: 1.6;
 }
 
+
+/* Section titles */
+
 .section-title {
     font-size: 28px;
     font-weight: 800;
     margin-top: 38px;
     margin-bottom: 15px;
 }
+
+
+/* Information cards */
 
 .info-card {
     background: rgba(24, 27, 40, 0.78);
@@ -105,12 +137,18 @@ st.markdown("""
     line-height: 1.55;
 }
 
+
+/* Upload */
+
 .upload-card {
     background: rgba(24,27,40,0.85);
     border: 1px solid rgba(192,132,252,0.22);
     border-radius: 22px;
     padding: 24px;
 }
+
+
+/* Results */
 
 .result-normal {
     background: rgba(34,197,94,0.10);
@@ -144,14 +182,8 @@ st.markdown("""
     margin-top: 6px;
 }
 
-.footer {
-    text-align: center;
-    color: #71717a;
-    font-size: 13px;
-    margin-top: 50px;
-    padding-top: 25px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-}
+
+/* Login */
 
 .auth-title {
     text-align: center;
@@ -173,12 +205,24 @@ st.markdown("""
     margin-top: 18px;
 }
 
+
+/* Footer */
+
+.footer {
+    text-align: center;
+    color: #71717a;
+    font-size: 13px;
+    margin-top: 50px;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
 </style>
 """, unsafe_allow_html=True)
 
 
 # =========================================================
-# SUPABASE AUTH
+# SUPABASE AUTHENTICATION
 # =========================================================
 
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
@@ -186,6 +230,7 @@ SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 
 
 def supabase_headers():
+
     return {
         "apikey": SUPABASE_KEY,
         "Content-Type": "application/json"
@@ -193,6 +238,7 @@ def supabase_headers():
 
 
 def signup_user(email, password):
+
     return requests.post(
         f"{SUPABASE_URL}/auth/v1/signup",
         headers=supabase_headers(),
@@ -205,6 +251,7 @@ def signup_user(email, password):
 
 
 def login_user(email, password):
+
     return requests.post(
         f"{SUPABASE_URL}/auth/v1/token?grant_type=password",
         headers=supabase_headers(),
@@ -217,18 +264,22 @@ def login_user(email, password):
 
 
 def logout_user():
-    keys = [
+
+    for key in [
         "authenticated",
         "user_email",
         "access_token",
         "refresh_token"
-    ]
+    ]:
 
-    for key in keys:
-        st.session_state.pop(key, None)
+        st.session_state.pop(
+            key,
+            None
+        )
 
 
 if "authenticated" not in st.session_state:
+
     st.session_state.authenticated = False
 
 
@@ -255,8 +306,12 @@ if not st.session_state.authenticated:
     st.write("")
 
     login_tab, signup_tab = st.tabs(
-        ["🔐 Login", "✨ Create Account"]
+        [
+            "🔐 Login",
+            "✨ Create Account"
+        ]
     )
+
 
     # =====================================================
     # LOGIN
@@ -294,6 +349,7 @@ if not st.session_state.authenticated:
                 use_container_width=True
             )
 
+
         if login_clicked:
 
             if not email or not password:
@@ -316,12 +372,17 @@ if not st.session_state.authenticated:
                         data = response.json()
 
                         st.session_state.authenticated = True
-                        st.session_state.user_email = email.strip()
-                        st.session_state.access_token = data.get(
-                            "access_token"
+
+                        st.session_state.user_email = (
+                            email.strip()
                         )
-                        st.session_state.refresh_token = data.get(
-                            "refresh_token"
+
+                        st.session_state.access_token = (
+                            data.get("access_token")
+                        )
+
+                        st.session_state.refresh_token = (
+                            data.get("refresh_token")
                         )
 
                         st.rerun()
@@ -329,18 +390,25 @@ if not st.session_state.authenticated:
                     else:
 
                         try:
+
                             error_data = response.json()
 
                             message = (
                                 error_data.get("msg")
-                                or error_data.get("error_description")
-                                or error_data.get("message")
+                                or error_data.get(
+                                    "error_description"
+                                )
+                                or error_data.get(
+                                    "message"
+                                )
                                 or "Invalid email or password."
                             )
 
                         except Exception:
 
-                            message = "Invalid email or password."
+                            message = (
+                                "Invalid email or password."
+                            )
 
                         st.error(message)
 
@@ -396,6 +464,7 @@ if not st.session_state.authenticated:
                 use_container_width=True
             )
 
+
         if signup_clicked:
 
             if (
@@ -436,14 +505,17 @@ if not st.session_state.authenticated:
                         if data.get("access_token"):
 
                             st.session_state.authenticated = True
-                            st.session_state.user_email = new_email.strip()
 
-                            st.session_state.access_token = data.get(
-                                "access_token"
+                            st.session_state.user_email = (
+                                new_email.strip()
                             )
 
-                            st.session_state.refresh_token = data.get(
-                                "refresh_token"
+                            st.session_state.access_token = (
+                                data.get("access_token")
+                            )
+
+                            st.session_state.refresh_token = (
+                                data.get("refresh_token")
                             )
 
                             st.rerun()
@@ -455,25 +527,32 @@ if not st.session_state.authenticated:
                             )
 
                             st.info(
-                                "Check your email to confirm your account, "
-                                "then log in."
+                                "Check your email to confirm "
+                                "your account, then log in."
                             )
 
                     else:
 
                         try:
+
                             error_data = response.json()
 
                             message = (
                                 error_data.get("msg")
-                                or error_data.get("error_description")
-                                or error_data.get("message")
+                                or error_data.get(
+                                    "error_description"
+                                )
+                                or error_data.get(
+                                    "message"
+                                )
                                 or "Could not create the account."
                             )
 
                         except Exception:
 
-                            message = "Could not create the account."
+                            message = (
+                                "Could not create the account."
+                            )
 
                         st.error(message)
 
@@ -482,6 +561,7 @@ if not st.session_state.authenticated:
                     st.error(
                         "Unable to connect to authentication service."
                     )
+
 
     st.markdown(
         "<p class='auth-note'>"
@@ -500,14 +580,18 @@ if not st.session_state.authenticated:
 @st.cache_resource
 def load_model():
 
-    model_path = "/tmp/InceptionV3_UCL_Final.keras"
+    model_path = (
+        "/tmp/InceptionV3_UCL_Final.keras"
+    )
 
     if not os.path.exists(model_path):
 
         url = (
             "https://huggingface.co/"
-            "abhijeetgour12/sickle-cell-inceptionv3/"
-            "resolve/main/InceptionV3_UCL_Final.keras"
+            "abhijeetgour12/"
+            "sickle-cell-inceptionv3/"
+            "resolve/main/"
+            "InceptionV3_UCL_Final.keras"
             "?download=true"
         )
 
@@ -518,14 +602,19 @@ def load_model():
 
         response.raise_for_status()
 
-        with open(model_path, "wb") as f:
+        with open(
+            model_path,
+            "wb"
+        ) as f:
 
             for chunk in response.iter_content(
                 chunk_size=1024 * 1024
             ):
 
                 if chunk:
+
                     f.write(chunk)
+
 
     return tf.keras.models.load_model(
         model_path
@@ -547,18 +636,25 @@ def make_gradcam(image_array):
 
     target_layer = None
 
-    for layer in reversed(backbone.layers):
+
+    for layer in reversed(
+        backbone.layers
+    ):
 
         try:
 
-            if len(layer.output.shape) == 4:
+            if len(
+                layer.output.shape
+            ) == 4:
 
                 target_layer = layer
+
                 break
 
         except Exception:
 
             continue
+
 
     grad_model = tf.keras.Model(
         inputs=backbone.input,
@@ -568,16 +664,21 @@ def make_gradcam(image_array):
         ]
     )
 
+
     with tf.GradientTape() as tape:
 
-        conv_outputs, backbone_features = grad_model(
-            image_array,
-            training=False
+        conv_outputs, backbone_features = (
+            grad_model(
+                image_array,
+                training=False
+            )
         )
+
 
         x = model.get_layer(
             "global_average_pooling2d"
         )(backbone_features)
+
 
         x = model.get_layer(
             "dropout"
@@ -586,37 +687,47 @@ def make_gradcam(image_array):
             training=False
         )
 
+
         prediction = model.get_layer(
             "dense"
         )(x)
 
+
         loss = prediction[:, 0]
+
 
     grads = tape.gradient(
         loss,
         conv_outputs
     )
 
+
     pooled_grads = tf.reduce_mean(
         grads,
         axis=(0, 1, 2)
     )
 
+
     conv_outputs = conv_outputs[0]
+
 
     heatmap = tf.reduce_sum(
         conv_outputs * pooled_grads,
         axis=-1
     )
 
+
     heatmap = tf.maximum(
         heatmap,
         0
     )
 
+
     heatmap /= (
-        tf.reduce_max(heatmap) + 1e-8
+        tf.reduce_max(heatmap)
+        + 1e-8
     )
+
 
     return heatmap.numpy()
 
@@ -629,6 +740,7 @@ header_left, header_right = st.columns(
     [8, 1]
 )
 
+
 with header_left:
 
     st.markdown(
@@ -638,6 +750,7 @@ with header_left:
         unsafe_allow_html=True
     )
 
+
 with header_right:
 
     if st.button(
@@ -646,6 +759,7 @@ with header_right:
     ):
 
         logout_user()
+
         st.rerun()
 
 
@@ -688,6 +802,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
 st.write(
     """
 Sickle Cell Disease (SCD) is a genetic blood disorder in
@@ -714,11 +829,14 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
 c1, c2, c3 = st.columns(3)
+
 
 with c1:
 
-    st.markdown("""
+    st.markdown(
+        """
 <div class="info-card">
 
 <h3>🔬 Image Analysis</h3>
@@ -729,12 +847,15 @@ deep-learning model analyze its visual features.
 </p>
 
 </div>
-""", unsafe_allow_html=True)
+""",
+        unsafe_allow_html=True
+    )
 
 
 with c2:
 
-    st.markdown("""
+    st.markdown(
+        """
 <div class="info-card">
 
 <h3>🧠 AI Classification</h3>
@@ -745,12 +866,15 @@ prediction together with a model probability score.
 </p>
 
 </div>
-""", unsafe_allow_html=True)
+""",
+        unsafe_allow_html=True
+    )
 
 
 with c3:
 
-    st.markdown("""
+    st.markdown(
+        """
 <div class="info-card">
 
 <h3>🔥 Visual Explanation</h3>
@@ -761,7 +885,9 @@ to the model's prediction.
 </p>
 
 </div>
-""", unsafe_allow_html=True)
+""",
+        unsafe_allow_html=True
+    )
 
 
 # =========================================================
@@ -775,14 +901,17 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
 st.write(
     "Upload an image below to start the AI analysis."
 )
+
 
 st.markdown(
     '<div class="upload-card">',
     unsafe_allow_html=True
 )
+
 
 uploaded_file = st.file_uploader(
     "Choose a blood-smear image",
@@ -794,6 +923,7 @@ uploaded_file = st.file_uploader(
         "tiff"
     ]
 )
+
 
 st.markdown(
     '</div>',
@@ -811,14 +941,18 @@ if uploaded_file is not None:
         uploaded_file
     ).convert("RGB")
 
+
     # Same preprocessing used during training
+
     resized = image.resize(
         (224, 224)
     )
 
+
     image_array = np.array(
         resized
     ).astype("float32")
+
 
     image_array = np.expand_dims(
         image_array,
@@ -841,7 +975,10 @@ if uploaded_file is not None:
             )[0][0]
         )
 
-    normal_probability = 1 - probability
+
+    normal_probability = (
+        1 - probability
+    )
 
 
     # =====================================================
@@ -855,14 +992,19 @@ if uploaded_file is not None:
         unsafe_allow_html=True
     )
 
+
     if probability >= 0.5:
 
-        confidence = probability * 100
+        confidence = (
+            probability * 100
+        )
+
 
         st.markdown(
             '<div class="result-sickle">',
             unsafe_allow_html=True
         )
+
 
         st.markdown(
             '<div class="result-title">'
@@ -871,9 +1013,11 @@ if uploaded_file is not None:
             unsafe_allow_html=True
         )
 
+
         st.write(
             "Model prediction"
         )
+
 
         st.markdown(
             '<div class="result-score">'
@@ -882,6 +1026,7 @@ if uploaded_file is not None:
             unsafe_allow_html=True
         )
 
+
         st.markdown(
             '<div class="result-label">'
             'prediction score'
@@ -889,19 +1034,25 @@ if uploaded_file is not None:
             unsafe_allow_html=True
         )
 
+
         st.markdown(
             '</div>',
             unsafe_allow_html=True
         )
 
+
     else:
 
-        confidence = normal_probability * 100
+        confidence = (
+            normal_probability * 100
+        )
+
 
         st.markdown(
             '<div class="result-normal">',
             unsafe_allow_html=True
         )
+
 
         st.markdown(
             '<div class="result-title">'
@@ -910,9 +1061,11 @@ if uploaded_file is not None:
             unsafe_allow_html=True
         )
 
+
         st.write(
             "Model prediction"
         )
+
 
         st.markdown(
             '<div class="result-score">'
@@ -921,12 +1074,14 @@ if uploaded_file is not None:
             unsafe_allow_html=True
         )
 
+
         st.markdown(
             '<div class="result-label">'
             'prediction score'
             '</div>',
             unsafe_allow_html=True
         )
+
 
         st.markdown(
             '</div>',
@@ -942,7 +1097,9 @@ if uploaded_file is not None:
         "### Prediction Breakdown"
     )
 
+
     col1, col2 = st.columns(2)
+
 
     with col1:
 
@@ -950,13 +1107,16 @@ if uploaded_file is not None:
             "🟢 **Normal Probability**"
         )
 
+
         st.progress(
             float(normal_probability)
         )
 
+
         st.caption(
             f"{normal_probability * 100:.1f}%"
         )
+
 
     with col2:
 
@@ -964,9 +1124,11 @@ if uploaded_file is not None:
             "🔴 **Sickle Cell Probability**"
         )
 
+
         st.progress(
             float(probability)
         )
+
 
         st.caption(
             f"{probability * 100:.1f}%"
@@ -984,10 +1146,12 @@ if uploaded_file is not None:
         unsafe_allow_html=True
     )
 
+
     st.write(
         "Grad-CAM provides a visual indication of the image "
         "regions that influenced the model's prediction."
     )
+
 
     with st.spinner(
         "Generating Grad-CAM..."
@@ -997,7 +1161,9 @@ if uploaded_file is not None:
             image_array
         )
 
+
     col1, col2 = st.columns(2)
+
 
     with col1:
 
@@ -1005,10 +1171,12 @@ if uploaded_file is not None:
             "Original Image"
         )
 
+
         st.image(
             image,
             use_container_width=True
         )
+
 
     with col2:
 
@@ -1016,13 +1184,16 @@ if uploaded_file is not None:
             "Grad-CAM Visualization"
         )
 
+
         fig, ax = plt.subplots(
             figsize=(7, 5)
         )
 
+
         ax.imshow(
             image
         )
+
 
         ax.imshow(
             heatmap,
@@ -1036,7 +1207,9 @@ if uploaded_file is not None:
             )
         )
 
+
         ax.axis("off")
+
 
         st.pyplot(
             fig,
@@ -1055,11 +1228,13 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
 with st.expander(
     "View project and model information"
 ):
 
-    st.markdown("""
+    st.markdown(
+        """
 ### About the Project
 
 **SickleScan** is an academic deep-learning research
@@ -1090,20 +1265,25 @@ contributed to the model's prediction.
 SickleScan is an academic research prototype. Its output
 should not be used as a substitute for professional medical
 diagnosis.
-""")
+"""
+    )
 
 
 # =========================================================
 # FOOTER
 # =========================================================
 
-st.markdown("""
+st.markdown(
+    """
 <div class="footer">
 
 🩸 <b>SICKLESCAN</b><br>
+
 AI-Powered Blood Smear Analysis<br><br>
 
 Deep Learning Research Project • InceptionV3 • Grad-CAM
 
 </div>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True
+)
