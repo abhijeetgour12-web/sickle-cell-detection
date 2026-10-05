@@ -27,20 +27,21 @@ st.markdown("""
 <style>
 
 /* Main background */
-
 .stApp {
     background:
-        radial-gradient(
-            circle at 5% 5%,
-            rgba(124, 58, 237, 0.18),
-            transparent 30%
-        ),
-        radial-gradient(
-            circle at 95% 5%,
-            rgba(219, 39, 119, 0.14),
-            transparent 30%
-        ),
-        #080a12;
+        radial-gradient(circle at 8% 0%, rgba(99,102,241,0.16), transparent 28%),
+        radial-gradient(circle at 92% 8%, rgba(236,72,153,0.10), transparent 25%),
+        linear-gradient(180deg, #070911 0%, #0b0e18 52%, #080a12 100%);
+    color: #f8fafc;
+}
+
+[data-testid="stAppViewContainer"] {
+    background: transparent;
+}
+
+[data-testid="stMainBlockContainer"] {
+    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
 
@@ -77,14 +78,13 @@ st.markdown("""
 
 
 /* Hero */
-
 .hero {
     text-align: center;
-    padding: 35px 10px 25px;
+    padding: 48px 10px 34px;
 }
 
 .hero h1 {
-    font-size: 52px;
+    font-size: clamp(38px, 5vw, 58px);
     font-weight: 850;
     margin-bottom: 12px;
 
@@ -119,8 +119,9 @@ st.markdown("""
 
 
 /* Information cards */
-
 .info-card {
+    transition: transform .2s ease, border-color .2s ease, background .2s ease;
+}
     background: rgba(24, 27, 40, 0.78);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 18px;
@@ -206,8 +207,60 @@ st.markdown("""
 }
 
 
-/* Footer */
+/* Premium cards */
+.info-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(192,132,252,0.28);
+    background: rgba(30,34,50,0.90);
+}
 
+.upload-card {
+    box-shadow: 0 18px 50px rgba(0,0,0,0.20);
+}
+
+[data-testid="stFileUploaderDropzone"] {
+    border: 1px dashed rgba(192,132,252,0.42) !important;
+    background: rgba(255,255,255,0.025) !important;
+    border-radius: 16px !important;
+}
+
+[data-testid="stFileUploaderDropzone"]:hover {
+    border-color: rgba(244,114,182,0.65) !important;
+}
+
+.stButton > button {
+    border-radius: 12px !important;
+    border: 1px solid rgba(192,132,252,0.28) !important;
+    background: linear-gradient(135deg, rgba(124,58,237,0.90), rgba(219,39,119,0.82)) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    min-height: 44px;
+}
+
+.stButton > button:hover {
+    border-color: rgba(255,255,255,0.35) !important;
+    transform: translateY(-1px);
+}
+
+[data-testid="stProgressBar"] > div > div {
+    border-radius: 99px;
+}
+
+div[data-baseweb="tab-list"] {
+    gap: 8px;
+}
+
+button[data-baseweb="tab"] {
+    border-radius: 10px !important;
+}
+
+[data-testid="stExpander"] {
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 16px !important;
+    background: rgba(24,27,40,0.55) !important;
+}
+
+/* Footer */
 .footer {
     text-align: center;
     color: #71717a;
@@ -771,6 +824,13 @@ st.caption(
     )
 )
 
+st.markdown(
+    "<div style='text-align:center; margin-top:-8px; color:#71717a; font-size:12px;'>"
+    "AI research prototype • Image-level classification"
+    "</div>",
+    unsafe_allow_html=True
+)
+
 
 # =========================================================
 # HERO
@@ -782,9 +842,9 @@ st.markdown("""
 <h1>AI-Powered Blood Smear Analysis</h1>
 
 <p>
-Explore how deep learning can analyze blood-smear images
-and classify them as Normal or Sickle Cell, with a visual
-explanation of the model's decision.
+Analyze a blood-smear image with SickleScan and explore
+the model's prediction together with a visual Grad-CAM
+explanation of the regions that influenced the result.
 </p>
 
 </div>
