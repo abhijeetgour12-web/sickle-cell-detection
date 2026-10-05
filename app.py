@@ -18,7 +18,23 @@ st.set_page_config(
 # -----------------------------
 @st.cache_resource
 def load_model():
-    return tf.keras.models.load_model("InceptionV3_UCL_Final.keras")
+    import requests
+    import os
+
+    model_path = "/tmp/InceptionV3_UCL_Final.keras"
+
+    if not os.path.exists(model_path):
+        url = "https://huggingface.co/abhijeetgour12/sickle-cell-inceptionv3/resolve/main/InceptionV3_UCL_Final.keras?download=true"
+
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+
+        with open(model_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=1024 * 1024):
+                if chunk:
+                    f.write(chunk)
+
+    return tf.keras.models.load_model(model_path)
 
 model = load_model()
 
