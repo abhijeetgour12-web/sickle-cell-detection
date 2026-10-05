@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import requests
 import os
 
-
 # =========================================================
 # PAGE CONFIG
 # =========================================================
@@ -18,256 +17,394 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-
 # =========================================================
-# CUSTOM CSS
+# PREMIUM UI
 # =========================================================
 
 st.markdown("""
 <style>
 
-/* Main background */
+* {
+    box-sizing: border-box;
+}
+
 .stApp {
     background:
-        radial-gradient(circle at 8% 0%, rgba(99,102,241,0.16), transparent 28%),
-        radial-gradient(circle at 92% 8%, rgba(236,72,153,0.10), transparent 25%),
-        linear-gradient(180deg, #070911 0%, #0b0e18 52%, #080a12 100%);
-    color: #f8fafc;
+        radial-gradient(circle at 10% 0%,
+            rgba(124,58,237,.20), transparent 28%),
+        radial-gradient(circle at 90% 8%,
+            rgba(236,72,153,.14), transparent 26%),
+        linear-gradient(180deg,#070911 0%,#0b0e18 55%,#070911 100%);
+    color:#f8fafc;
 }
-
-[data-testid="stAppViewContainer"] {
-    background: transparent;
-}
-
-[data-testid="stMainBlockContainer"] {
-    padding-left: 2rem;
-    padding-right: 2rem;
-}
-
-
-/* Keep Streamlit toolbar icons,
-   remove black background/line */
 
 [data-testid="stHeader"] {
-    background: transparent !important;
-    border-bottom: none !important;
-    box-shadow: none !important;
+    background:transparent !important;
+    border-bottom:none !important;
+    box-shadow:none !important;
 }
-
-
-/* Main container */
 
 .block-container {
-    max-width: 1150px;
-    padding-top: 25px;
-    padding-bottom: 50px;
+    max-width:1180px;
+    padding-top:28px;
+    padding-bottom:70px;
 }
 
+/* ================= HEADER ================= */
 
-/* Logo */
-
-.logo {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: 1px;
+.topbar {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 0 18px;
 }
 
-.logo span {
-    color: #c084fc;
+.brand {
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:1.5px;
 }
 
-
-/* Hero */
-.hero {
-    text-align: center;
-    padding: 48px 10px 34px;
+.brand span {
+    color:#c084fc;
 }
 
-.hero h1 {
-    font-size: clamp(38px, 5vw, 58px);
-    font-weight: 850;
-    margin-bottom: 12px;
+.user-badge {
+    display:inline-block;
+    padding:8px 14px;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.08);
+    color:#a1a1aa;
+    font-size:12px;
+}
 
-    background: linear-gradient(
-        90deg,
-        #ffffff,
-        #c084fc,
-        #f9a8d4
+/* ================= HERO ================= */
+
+.hero-box {
+    position:relative;
+    overflow:hidden;
+    text-align:center;
+    padding:70px 30px 60px;
+    margin:10px 0 35px;
+    border:1px solid rgba(192,132,252,.16);
+    border-radius:30px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(124,58,237,.12),
+            rgba(219,39,119,.06)
+        ),
+        rgba(15,17,28,.75);
+    box-shadow:0 30px 80px rgba(0,0,0,.25);
+}
+
+.hero-badge {
+    display:inline-block;
+    padding:7px 15px;
+    border-radius:999px;
+    background:rgba(192,132,252,.10);
+    border:1px solid rgba(192,132,252,.25);
+    color:#d8b4fe;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.8px;
+    margin-bottom:18px;
+}
+
+.hero-box h1 {
+    font-size:clamp(40px,6vw,68px);
+    line-height:1.05;
+    margin:0 0 18px;
+    font-weight:900;
+    background:linear-gradient(
+        90deg,#fff,#c084fc,#f9a8d4
     );
-
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
 }
 
-.hero p {
-    max-width: 760px;
-    margin: auto;
-    color: #a1a1aa;
-    font-size: 18px;
-    line-height: 1.6;
+.hero-box p {
+    max-width:720px;
+    margin:auto;
+    color:#a1a1aa;
+    font-size:17px;
+    line-height:1.7;
 }
 
+/* ================= SECTION ================= */
 
-/* Section titles */
-
-.section-title {
-    font-size: 28px;
-    font-weight: 800;
-    margin-top: 38px;
-    margin-bottom: 15px;
+.section-heading {
+    font-size:27px;
+    font-weight:850;
+    margin:40px 0 16px;
 }
 
+/* ================= FEATURE CARDS ================= */
 
-/* Information cards */
-.info-card {
-    transition: transform .2s ease, border-color .2s ease, background .2s ease;
-}
-    background: rgba(24, 27, 40, 0.78);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 18px;
-    padding: 22px;
-    min-height: 165px;
-}
-
-.info-card h3 {
-    margin-top: 5px;
+.feature {
+    min-height:185px;
+    padding:25px;
+    border-radius:20px;
+    background:rgba(20,23,36,.78);
+    border:1px solid rgba(255,255,255,.07);
+    transition:.2s ease;
 }
 
-.info-card p {
-    color: #a1a1aa;
-    line-height: 1.55;
+.feature:hover {
+    transform:translateY(-4px);
+    border-color:rgba(192,132,252,.30);
+    background:rgba(27,30,45,.92);
 }
 
-
-/* Upload */
-
-.upload-card {
-    background: rgba(24,27,40,0.85);
-    border: 1px solid rgba(192,132,252,0.22);
-    border-radius: 22px;
-    padding: 24px;
+.feature-icon {
+    font-size:28px;
+    margin-bottom:13px;
 }
 
-
-/* Results */
-
-.result-normal {
-    background: rgba(34,197,94,0.10);
-    border: 1px solid rgba(74,222,128,0.30);
-    border-radius: 20px;
-    padding: 26px;
-    text-align: center;
+.feature h3 {
+    margin:0 0 9px;
+    font-size:18px;
 }
 
-.result-sickle {
-    background: rgba(239,68,68,0.10);
-    border: 1px solid rgba(248,113,113,0.35);
-    border-radius: 20px;
-    padding: 26px;
-    text-align: center;
+.feature p {
+    color:#9293a0;
+    line-height:1.55;
+    font-size:14px;
 }
 
-.result-title {
-    font-size: 30px;
-    font-weight: 800;
+/* ================= UPLOAD ================= */
+
+.upload-wrapper {
+    padding:28px;
+    border-radius:24px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(124,58,237,.10),
+            rgba(24,27,40,.90)
+        );
+    border:1px solid rgba(192,132,252,.22);
+    box-shadow:0 25px 65px rgba(0,0,0,.22);
 }
 
-.result-label {
-    color: #a1a1aa;
-    margin-top: 5px;
+.upload-title {
+    font-size:21px;
+    font-weight:800;
+    margin-bottom:6px;
 }
 
-.result-score {
-    font-size: 36px;
-    font-weight: 850;
-    margin-top: 6px;
-}
-
-
-/* Login */
-
-.auth-title {
-    text-align: center;
-    font-size: 30px;
-    font-weight: 800;
-    margin-top: 20px;
-}
-
-.auth-subtitle {
-    text-align: center;
-    color: #a1a1aa;
-    margin-bottom: 25px;
-}
-
-.auth-note {
-    text-align: center;
-    color: #71717a;
-    font-size: 12px;
-    margin-top: 18px;
-}
-
-
-/* Premium cards */
-.info-card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(192,132,252,0.28);
-    background: rgba(30,34,50,0.90);
-}
-
-.upload-card {
-    box-shadow: 0 18px 50px rgba(0,0,0,0.20);
+.upload-subtitle {
+    color:#888a97;
+    font-size:14px;
+    margin-bottom:20px;
 }
 
 [data-testid="stFileUploaderDropzone"] {
-    border: 1px dashed rgba(192,132,252,0.42) !important;
-    background: rgba(255,255,255,0.025) !important;
-    border-radius: 16px !important;
+    min-height:150px;
+    border:1px dashed rgba(192,132,252,.45) !important;
+    border-radius:18px !important;
+    background:rgba(255,255,255,.025) !important;
 }
 
-[data-testid="stFileUploaderDropzone"]:hover {
-    border-color: rgba(244,114,182,0.65) !important;
+/* ================= RESULT ================= */
+
+.result-card {
+    padding:35px 25px;
+    text-align:center;
+    border-radius:24px;
+    margin:18px 0 28px;
 }
+
+.result-positive {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(239,68,68,.14),
+            rgba(127,29,29,.08)
+        );
+    border:1px solid rgba(248,113,113,.35);
+}
+
+.result-negative {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(34,197,94,.14),
+            rgba(20,83,45,.08)
+        );
+    border:1px solid rgba(74,222,128,.32);
+}
+
+.result-status {
+    font-size:34px;
+    font-weight:900;
+    margin-bottom:8px;
+}
+
+.result-caption {
+    color:#9293a0;
+    font-size:14px;
+}
+
+.result-score {
+    font-size:48px;
+    font-weight:900;
+    margin-top:10px;
+}
+
+/* ================= PROBABILITY ================= */
+
+.prob-card {
+    padding:22px;
+    border-radius:18px;
+    background:rgba(20,23,36,.72);
+    border:1px solid rgba(255,255,255,.07);
+}
+
+/* ================= GRAD CAM ================= */
+
+.cam-card {
+    padding:18px;
+    border-radius:22px;
+    background:rgba(20,23,36,.78);
+    border:1px solid rgba(255,255,255,.07);
+}
+
+.cam-label {
+    text-align:center;
+    font-weight:750;
+    margin-bottom:12px;
+    color:#e4e4e7;
+}
+
+/* ================= BUTTON ================= */
 
 .stButton > button {
-    border-radius: 12px !important;
-    border: 1px solid rgba(192,132,252,0.28) !important;
-    background: linear-gradient(135deg, rgba(124,58,237,0.90), rgba(219,39,119,0.82)) !important;
-    color: white !important;
-    font-weight: 700 !important;
-    min-height: 44px;
+    min-height:45px !important;
+    border-radius:12px !important;
+    border:1px solid rgba(192,132,252,.25) !important;
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #db2777
+        ) !important;
+    color:white !important;
+    font-weight:750 !important;
 }
 
 .stButton > button:hover {
-    border-color: rgba(255,255,255,0.35) !important;
-    transform: translateY(-1px);
+    transform:translateY(-1px);
+    border-color:rgba(255,255,255,.35) !important;
 }
 
-[data-testid="stProgressBar"] > div > div {
-    border-radius: 99px;
+/* ================= LOGIN ================= */
+
+.login-shell {
+    max-width:560px;
+    margin:70px auto 0;
+    padding:42px;
+    border-radius:28px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(124,58,237,.09),
+            rgba(20,23,36,.92)
+        );
+    border:1px solid rgba(255,255,255,.09);
+    box-shadow:0 30px 90px rgba(0,0,0,.35);
 }
 
-div[data-baseweb="tab-list"] {
-    gap: 8px;
+.login-brand {
+    text-align:center;
+    font-size:32px;
+    font-weight:900;
+    letter-spacing:1px;
 }
 
-button[data-baseweb="tab"] {
-    border-radius: 10px !important;
+.login-brand span {
+    color:#c084fc;
 }
+
+.login-tag {
+    text-align:center;
+    color:#8f909b;
+    margin:9px 0 28px;
+}
+
+.auth-title {
+    text-align:center;
+    font-size:25px;
+    font-weight:850;
+}
+
+.auth-subtitle {
+    text-align:center;
+    color:#858692;
+    margin-bottom:20px;
+}
+
+.auth-note {
+    text-align:center;
+    color:#666874;
+    font-size:12px;
+    margin-top:20px;
+}
+
+/* ================= EXPANDER ================= */
 
 [data-testid="stExpander"] {
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    border-radius: 16px !important;
-    background: rgba(24,27,40,0.55) !important;
+    border-radius:18px !important;
+    border:1px solid rgba(255,255,255,.08) !important;
+    background:rgba(20,23,36,.55) !important;
 }
 
-/* Footer */
+/* ================= FOOTER ================= */
+
 .footer {
-    text-align: center;
-    color: #71717a;
-    font-size: 13px;
-    margin-top: 50px;
-    padding-top: 25px;
-    border-top: 1px solid rgba(255,255,255,0.06);
+    text-align:center;
+    margin-top:60px;
+    padding-top:25px;
+    border-top:1px solid rgba(255,255,255,.06);
+    color:#686a76;
+    font-size:12px;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width:700px) {
+
+    .block-container {
+        padding-left:16px;
+        padding-right:16px;
+    }
+
+    .hero-box {
+        padding:48px 18px;
+        border-radius:22px;
+    }
+
+    .hero-box p {
+        font-size:15px;
+    }
+
+    .section-heading {
+        font-size:23px;
+    }
+
+    .upload-wrapper {
+        padding:18px;
+    }
+
+    .login-shell {
+        margin-top:25px;
+        padding:25px 18px;
+    }
+
+    .result-score {
+        font-size:40px;
+    }
 }
 
 </style>
@@ -275,7 +412,7 @@ button[data-baseweb="tab"] {
 
 
 # =========================================================
-# SUPABASE AUTHENTICATION
+# SUPABASE
 # =========================================================
 
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
@@ -283,7 +420,6 @@ SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 
 
 def supabase_headers():
-
     return {
         "apikey": SUPABASE_KEY,
         "Content-Type": "application/json"
@@ -291,7 +427,6 @@ def supabase_headers():
 
 
 def signup_user(email, password):
-
     return requests.post(
         f"{SUPABASE_URL}/auth/v1/signup",
         headers=supabase_headers(),
@@ -304,7 +439,6 @@ def signup_user(email, password):
 
 
 def login_user(email, password):
-
     return requests.post(
         f"{SUPABASE_URL}/auth/v1/token?grant_type=password",
         headers=supabase_headers(),
@@ -317,58 +451,44 @@ def login_user(email, password):
 
 
 def logout_user():
-
     for key in [
         "authenticated",
         "user_email",
         "access_token",
         "refresh_token"
     ]:
-
-        st.session_state.pop(
-            key,
-            None
-        )
+        st.session_state.pop(key, None)
 
 
 if "authenticated" not in st.session_state:
-
     st.session_state.authenticated = False
 
 
 # =========================================================
-# LOGIN / SIGNUP PAGE
+# LOGIN PAGE
 # =========================================================
 
 if not st.session_state.authenticated:
 
-    st.markdown(
-        "<h1 style='text-align:center; margin-top:70px;'>"
-        "🩸 SICKLESCAN"
-        "</h1>",
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div class="login-shell">
 
-    st.markdown(
-        "<p style='text-align:center; color:#a1a1aa;'>"
-        "AI-Powered Blood Smear Analysis"
-        "</p>",
-        unsafe_allow_html=True
-    )
+        <div class="login-brand">
+            🩸 <span>SICKLESCAN</span>
+        </div>
 
-    st.write("")
+        <div class="login-tag">
+            AI-powered blood smear analysis
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
 
     login_tab, signup_tab = st.tabs(
-        [
-            "🔐 Login",
-            "✨ Create Account"
-        ]
+        ["🔐 Login", "✨ Create Account"]
     )
 
-
-    # =====================================================
-    # LOGIN
-    # =====================================================
+    # ---------------- LOGIN ----------------
 
     with login_tab:
 
@@ -379,7 +499,7 @@ if not st.session_state.authenticated:
 
         st.markdown(
             "<p class='auth-subtitle'>"
-            "Sign in to continue to SickleScan"
+            "Sign in to access your SickleScan dashboard"
             "</p>",
             unsafe_allow_html=True
         )
@@ -401,7 +521,6 @@ if not st.session_state.authenticated:
                 "Login",
                 use_container_width=True
             )
-
 
         if login_clicked:
 
@@ -425,17 +544,12 @@ if not st.session_state.authenticated:
                         data = response.json()
 
                         st.session_state.authenticated = True
-
-                        st.session_state.user_email = (
-                            email.strip()
+                        st.session_state.user_email = email.strip()
+                        st.session_state.access_token = data.get(
+                            "access_token"
                         )
-
-                        st.session_state.access_token = (
-                            data.get("access_token")
-                        )
-
-                        st.session_state.refresh_token = (
-                            data.get("refresh_token")
+                        st.session_state.refresh_token = data.get(
+                            "refresh_token"
                         )
 
                         st.rerun()
@@ -443,25 +557,17 @@ if not st.session_state.authenticated:
                     else:
 
                         try:
-
                             error_data = response.json()
 
                             message = (
                                 error_data.get("msg")
-                                or error_data.get(
-                                    "error_description"
-                                )
-                                or error_data.get(
-                                    "message"
-                                )
+                                or error_data.get("error_description")
+                                or error_data.get("message")
                                 or "Invalid email or password."
                             )
 
                         except Exception:
-
-                            message = (
-                                "Invalid email or password."
-                            )
+                            message = "Invalid email or password."
 
                         st.error(message)
 
@@ -471,10 +577,7 @@ if not st.session_state.authenticated:
                         "Unable to connect to authentication service."
                     )
 
-
-    # =====================================================
-    # SIGN UP
-    # =====================================================
+    # ---------------- SIGNUP ----------------
 
     with signup_tab:
 
@@ -517,18 +620,11 @@ if not st.session_state.authenticated:
                 use_container_width=True
             )
 
-
         if signup_clicked:
 
-            if (
-                not new_email
-                or not new_password
-                or not confirm_password
-            ):
+            if not new_email or not new_password or not confirm_password:
 
-                st.error(
-                    "Please fill in all fields."
-                )
+                st.error("Please fill in all fields.")
 
             elif len(new_password) < 6:
 
@@ -538,9 +634,7 @@ if not st.session_state.authenticated:
 
             elif new_password != confirm_password:
 
-                st.error(
-                    "Passwords do not match."
-                )
+                st.error("Passwords do not match.")
 
             else:
 
@@ -558,17 +652,12 @@ if not st.session_state.authenticated:
                         if data.get("access_token"):
 
                             st.session_state.authenticated = True
-
-                            st.session_state.user_email = (
-                                new_email.strip()
+                            st.session_state.user_email = new_email.strip()
+                            st.session_state.access_token = data.get(
+                                "access_token"
                             )
-
-                            st.session_state.access_token = (
-                                data.get("access_token")
-                            )
-
-                            st.session_state.refresh_token = (
-                                data.get("refresh_token")
+                            st.session_state.refresh_token = data.get(
+                                "refresh_token"
                             )
 
                             st.rerun()
@@ -580,8 +669,8 @@ if not st.session_state.authenticated:
                             )
 
                             st.info(
-                                "Check your email to confirm "
-                                "your account, then log in."
+                                "Check your email to confirm your account, "
+                                "then log in."
                             )
 
                     else:
@@ -592,20 +681,14 @@ if not st.session_state.authenticated:
 
                             message = (
                                 error_data.get("msg")
-                                or error_data.get(
-                                    "error_description"
-                                )
-                                or error_data.get(
-                                    "message"
-                                )
+                                or error_data.get("error_description")
+                                or error_data.get("message")
                                 or "Could not create the account."
                             )
 
                         except Exception:
 
-                            message = (
-                                "Could not create the account."
-                            )
+                            message = "Could not create the account."
 
                         st.error(message)
 
@@ -614,7 +697,6 @@ if not st.session_state.authenticated:
                     st.error(
                         "Unable to connect to authentication service."
                     )
-
 
     st.markdown(
         "<p class='auth-note'>"
@@ -627,22 +709,19 @@ if not st.session_state.authenticated:
 
 
 # =========================================================
-# LOAD MODEL
+# MODEL
 # =========================================================
 
 @st.cache_resource
 def load_model():
 
-    model_path = (
-        "/tmp/InceptionV3_UCL_Final.keras"
-    )
+    model_path = "/tmp/InceptionV3_UCL_Final.keras"
 
     if not os.path.exists(model_path):
 
         url = (
             "https://huggingface.co/"
-            "abhijeetgour12/"
-            "sickle-cell-inceptionv3/"
+            "abhijeetgour12/sickle-cell-inceptionv3/"
             "resolve/main/"
             "InceptionV3_UCL_Final.keras"
             "?download=true"
@@ -655,23 +734,16 @@ def load_model():
 
         response.raise_for_status()
 
-        with open(
-            model_path,
-            "wb"
-        ) as f:
+        with open(model_path, "wb") as f:
 
             for chunk in response.iter_content(
                 chunk_size=1024 * 1024
             ):
 
                 if chunk:
-
                     f.write(chunk)
 
-
-    return tf.keras.models.load_model(
-        model_path
-    )
+    return tf.keras.models.load_model(model_path)
 
 
 model = load_model()
@@ -683,31 +755,21 @@ model = load_model()
 
 def make_gradcam(image_array):
 
-    backbone = model.get_layer(
-        "inception_v3"
-    )
+    backbone = model.get_layer("inception_v3")
 
     target_layer = None
 
-
-    for layer in reversed(
-        backbone.layers
-    ):
+    for layer in reversed(backbone.layers):
 
         try:
 
-            if len(
-                layer.output.shape
-            ) == 4:
+            if len(layer.output.shape) == 4:
 
                 target_layer = layer
-
                 break
 
         except Exception:
-
             continue
-
 
     grad_model = tf.keras.Model(
         inputs=backbone.input,
@@ -717,94 +779,75 @@ def make_gradcam(image_array):
         ]
     )
 
-
     with tf.GradientTape() as tape:
 
-        conv_outputs, backbone_features = (
-            grad_model(
-                image_array,
-                training=False
-            )
+        conv_outputs, backbone_features = grad_model(
+            image_array,
+            training=False
         )
-
 
         x = model.get_layer(
             "global_average_pooling2d"
         )(backbone_features)
 
-
-        x = model.get_layer(
-            "dropout"
-        )(
+        x = model.get_layer("dropout")(
             x,
             training=False
         )
 
-
-        prediction = model.get_layer(
-            "dense"
-        )(x)
-
+        prediction = model.get_layer("dense")(x)
 
         loss = prediction[:, 0]
-
 
     grads = tape.gradient(
         loss,
         conv_outputs
     )
 
-
     pooled_grads = tf.reduce_mean(
         grads,
         axis=(0, 1, 2)
     )
 
-
     conv_outputs = conv_outputs[0]
-
 
     heatmap = tf.reduce_sum(
         conv_outputs * pooled_grads,
         axis=-1
     )
 
-
     heatmap = tf.maximum(
         heatmap,
         0
     )
 
-
     heatmap /= (
-        tf.reduce_max(heatmap)
-        + 1e-8
+        tf.reduce_max(heatmap) + 1e-8
     )
-
 
     return heatmap.numpy()
 
 
 # =========================================================
-# HEADER
+# DASHBOARD HEADER
 # =========================================================
 
-header_left, header_right = st.columns(
-    [8, 1]
-)
+left, right = st.columns([7, 2])
 
-
-with header_left:
+with left:
 
     st.markdown(
-        '<div class="logo">'
-        '🩸 <span>SICKLESCAN</span>'
-        '</div>',
+        """
+        <div class="topbar">
+            <div class="brand">
+                🩸 <span>SICKLESCAN</span>
+            </div>
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
-
-with header_right:
+with right:
 
     if st.button(
         "Logout",
@@ -812,22 +855,21 @@ with header_right:
     ):
 
         logout_user()
-
         st.rerun()
 
 
-st.caption(
-    "Signed in as "
-    + st.session_state.get(
-        "user_email",
-        ""
-    )
-)
-
 st.markdown(
-    "<div style='text-align:center; margin-top:-8px; color:#71717a; font-size:12px;'>"
-    "AI research prototype • Image-level classification"
-    "</div>",
+    f"""
+    <div style="
+        text-align:right;
+        color:#777985;
+        font-size:12px;
+        margin-top:-18px;
+        margin-bottom:10px;
+    ">
+        Signed in as {st.session_state.get("user_email", "")}
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
@@ -836,116 +878,90 @@ st.markdown(
 # HERO
 # =========================================================
 
-st.markdown("""
-<div class="hero">
-
-<h1>AI-Powered Blood Smear Analysis</h1>
-
-<p>
-Analyze a blood-smear image with SickleScan and explore
-the model's prediction together with a visual Grad-CAM
-explanation of the regions that influenced the result.
-</p>
-
-</div>
-""", unsafe_allow_html=True)
-
-
-# =========================================================
-# ABOUT SICKLE CELL
-# =========================================================
-
 st.markdown(
-    '<div class="section-title">'
-    '🩸 What is Sickle Cell Disease?'
-    '</div>',
-    unsafe_allow_html=True
-)
-
-
-st.write(
     """
-Sickle Cell Disease (SCD) is a genetic blood disorder in
-which red blood cells can develop an abnormal sickle-like
-shape. These changes can affect the normal movement of blood
-through blood vessels.
+    <div class="hero-box">
 
-Blood-smear images provide visual information about the
-appearance of red blood cells. Deep-learning techniques can
-be used to learn visual patterns from these images and assist
-with image-level classification research.
-"""
-)
+        <div class="hero-badge">
+            🧠 DEEP LEARNING • GRAD-CAM
+        </div>
 
+        <h1>
+            AI-Powered Blood<br>
+            Smear Analysis
+        </h1>
 
-# =========================================================
-# WHAT SICKLESCAN DOES
-# =========================================================
+        <p>
+            Upload a blood-smear image and explore an
+            AI-generated classification with a visual
+            explanation of the regions influencing the result.
+        </p>
 
-st.markdown(
-    '<div class="section-title">'
-    '✨ What SickleScan Does'
-    '</div>',
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
+
+# =========================================================
+# FEATURES
+# =========================================================
+
+st.markdown(
+    "<div class='section-heading'>How SickleScan works</div>",
+    unsafe_allow_html=True
+)
 
 c1, c2, c3 = st.columns(3)
-
 
 with c1:
 
     st.markdown(
         """
-<div class="info-card">
-
-<h3>🔬 Image Analysis</h3>
-
-<p>
-Upload a blood-smear image and let the trained
-deep-learning model analyze its visual features.
-</p>
-
-</div>
-""",
+        <div class="feature">
+            <div class="feature-icon">🔬</div>
+            <h3>Image Analysis</h3>
+            <p>
+                Upload a blood-smear image and let the
+                trained deep-learning model analyze its
+                visual characteristics.
+            </p>
+        </div>
+        """,
         unsafe_allow_html=True
     )
-
 
 with c2:
 
     st.markdown(
         """
-<div class="info-card">
-
-<h3>🧠 AI Classification</h3>
-
-<p>
-The InceptionV3 model produces a Normal or Sickle Cell
-prediction together with a model probability score.
-</p>
-
-</div>
-""",
+        <div class="feature">
+            <div class="feature-icon">🧠</div>
+            <h3>AI Classification</h3>
+            <p>
+                InceptionV3 produces an image-level
+                Normal or Sickle Cell classification
+                with a probability score.
+            </p>
+        </div>
+        """,
         unsafe_allow_html=True
     )
-
 
 with c3:
 
     st.markdown(
         """
-<div class="info-card">
-
-<h3>🔥 Visual Explanation</h3>
-
-<p>
-Grad-CAM highlights image regions that contributed
-to the model's prediction.
-</p>
-
-</div>
-""",
+        <div class="feature">
+            <div class="feature-icon">🔥</div>
+            <h3>Visual Explanation</h3>
+            <p>
+                Grad-CAM highlights regions that
+                contributed to the model's prediction,
+                making the result easier to interpret.
+            </p>
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
@@ -955,26 +971,29 @@ to the model's prediction.
 # =========================================================
 
 st.markdown(
-    '<div class="section-title">'
-    '🔬 Analyze a Blood-Smear Image'
-    '</div>',
+    "<div class='section-heading'>Analyze an image</div>",
     unsafe_allow_html=True
 )
-
-
-st.write(
-    "Upload an image below to start the AI analysis."
-)
-
 
 st.markdown(
-    '<div class="upload-card">',
+    """
+    <div class="upload-wrapper">
+
+        <div class="upload-title">
+            📤 Upload Blood-Smear Image
+        </div>
+
+        <div class="upload-subtitle">
+            JPG, JPEG, PNG, TIFF • Best results with clear
+            blood-smear images
+        </div>
+
+    """,
     unsafe_allow_html=True
 )
 
-
 uploaded_file = st.file_uploader(
-    "Choose a blood-smear image",
+    "Drop your image here or browse",
     type=[
         "jpg",
         "jpeg",
@@ -984,9 +1003,8 @@ uploaded_file = st.file_uploader(
     ]
 )
 
-
 st.markdown(
-    '</div>',
+    "</div>",
     unsafe_allow_html=True
 )
 
@@ -1001,31 +1019,25 @@ if uploaded_file is not None:
         uploaded_file
     ).convert("RGB")
 
-
-    # Same preprocessing used during training
-
     resized = image.resize(
         (224, 224)
     )
 
-
     image_array = np.array(
         resized
     ).astype("float32")
-
 
     image_array = np.expand_dims(
         image_array,
         axis=0
     )
 
-
     # =====================================================
     # PREDICTION
     # =====================================================
 
     with st.spinner(
-        "🧠 AI is analyzing the image..."
+        "🧠 SickleScan is analyzing your image..."
     ):
 
         probability = float(
@@ -1035,10 +1047,7 @@ if uploaded_file is not None:
             )[0][0]
         )
 
-
-    normal_probability = (
-        1 - probability
-    )
+    normal_probability = 1 - probability
 
 
     # =====================================================
@@ -1046,105 +1055,65 @@ if uploaded_file is not None:
     # =====================================================
 
     st.markdown(
-        '<div class="section-title">'
-        '📊 Analysis Result'
-        '</div>',
+        "<div class='section-heading'>Analysis Result</div>",
         unsafe_allow_html=True
     )
 
-
     if probability >= 0.5:
 
-        confidence = (
-            probability * 100
-        )
-
+        confidence = probability * 100
 
         st.markdown(
-            '<div class="result-sickle">',
+            f"""
+            <div class="result-card result-positive">
+
+                <div class="result-status">
+                    🔴 Sickle Cell
+                </div>
+
+                <div class="result-caption">
+                    Model prediction
+                </div>
+
+                <div class="result-score">
+                    {confidence:.1f}%
+                </div>
+
+                <div class="result-caption">
+                    prediction confidence
+                </div>
+
+            </div>
+            """,
             unsafe_allow_html=True
         )
-
-
-        st.markdown(
-            '<div class="result-title">'
-            '🔴 Sickle Cell'
-            '</div>',
-            unsafe_allow_html=True
-        )
-
-
-        st.write(
-            "Model prediction"
-        )
-
-
-        st.markdown(
-            '<div class="result-score">'
-            f'{confidence:.1f}%'
-            '</div>',
-            unsafe_allow_html=True
-        )
-
-
-        st.markdown(
-            '<div class="result-label">'
-            'prediction score'
-            '</div>',
-            unsafe_allow_html=True
-        )
-
-
-        st.markdown(
-            '</div>',
-            unsafe_allow_html=True
-        )
-
 
     else:
 
-        confidence = (
-            normal_probability * 100
-        )
-
+        confidence = normal_probability * 100
 
         st.markdown(
-            '<div class="result-normal">',
-            unsafe_allow_html=True
-        )
+            f"""
+            <div class="result-card result-negative">
 
+                <div class="result-status">
+                    🟢 Normal
+                </div>
 
-        st.markdown(
-            '<div class="result-title">'
-            '🟢 Normal'
-            '</div>',
-            unsafe_allow_html=True
-        )
+                <div class="result-caption">
+                    Model prediction
+                </div>
 
+                <div class="result-score">
+                    {confidence:.1f}%
+                </div>
 
-        st.write(
-            "Model prediction"
-        )
+                <div class="result-caption">
+                    prediction confidence
+                </div>
 
-
-        st.markdown(
-            '<div class="result-score">'
-            f'{confidence:.1f}%'
-            '</div>',
-            unsafe_allow_html=True
-        )
-
-
-        st.markdown(
-            '<div class="result-label">'
-            'prediction score'
-            '</div>',
-            unsafe_allow_html=True
-        )
-
-
-        st.markdown(
-            '</div>',
+            </div>
+            """,
             unsafe_allow_html=True
         )
 
@@ -1154,44 +1123,54 @@ if uploaded_file is not None:
     # =====================================================
 
     st.markdown(
-        "### Prediction Breakdown"
+        "<div class='section-heading'>Prediction Breakdown</div>",
+        unsafe_allow_html=True
     )
 
+    p1, p2 = st.columns(2)
 
-    col1, col2 = st.columns(2)
+    with p1:
 
-
-    with col1:
-
-        st.write(
-            "🟢 **Normal Probability**"
+        st.markdown(
+            "<div class='prob-card'>",
+            unsafe_allow_html=True
         )
 
+        st.write("🟢 **Normal Probability**")
 
         st.progress(
             float(normal_probability)
         )
 
-
         st.caption(
             f"{normal_probability * 100:.1f}%"
         )
 
-
-    with col2:
-
-        st.write(
-            "🔴 **Sickle Cell Probability**"
+        st.markdown(
+            "</div>",
+            unsafe_allow_html=True
         )
 
+    with p2:
+
+        st.markdown(
+            "<div class='prob-card'>",
+            unsafe_allow_html=True
+        )
+
+        st.write("🔴 **Sickle Cell Probability**")
 
         st.progress(
             float(probability)
         )
 
-
         st.caption(
             f"{probability * 100:.1f}%"
+        )
+
+        st.markdown(
+            "</div>",
+            unsafe_allow_html=True
         )
 
 
@@ -1200,21 +1179,17 @@ if uploaded_file is not None:
     # =====================================================
 
     st.markdown(
-        '<div class="section-title">'
-        '🔥 Model Explanation'
-        '</div>',
+        "<div class='section-heading'>Model Explanation</div>",
         unsafe_allow_html=True
     )
 
-
     st.write(
-        "Grad-CAM provides a visual indication of the image "
-        "regions that influenced the model's prediction."
+        "Grad-CAM highlights image regions that influenced "
+        "the model's prediction."
     )
 
-
     with st.spinner(
-        "Generating Grad-CAM..."
+        "🔥 Generating Grad-CAM visualization..."
     ):
 
         heatmap = make_gradcam(
@@ -1222,38 +1197,39 @@ if uploaded_file is not None:
         )
 
 
-    col1, col2 = st.columns(2)
+    cam1, cam2 = st.columns(2)
 
+    with cam1:
 
-    with col1:
-
-        st.subheader(
-            "Original Image"
+        st.markdown(
+            "<div class='cam-card'>"
+            "<div class='cam-label'>Original Image</div>",
+            unsafe_allow_html=True
         )
-
 
         st.image(
             image,
             use_container_width=True
         )
 
-
-    with col2:
-
-        st.subheader(
-            "Grad-CAM Visualization"
+        st.markdown(
+            "</div>",
+            unsafe_allow_html=True
         )
 
+    with cam2:
+
+        st.markdown(
+            "<div class='cam-card'>"
+            "<div class='cam-label'>Grad-CAM Visualization</div>",
+            unsafe_allow_html=True
+        )
 
         fig, ax = plt.subplots(
             figsize=(7, 5)
         )
 
-
-        ax.imshow(
-            image
-        )
-
+        ax.imshow(image)
 
         ax.imshow(
             heatmap,
@@ -1267,30 +1243,31 @@ if uploaded_file is not None:
             )
         )
 
-
         ax.axis("off")
-
 
         st.pyplot(
             fig,
-            clear_figure=True
+            clear_figure=True,
+            use_container_width=True
+        )
+
+        st.markdown(
+            "</div>",
+            unsafe_allow_html=True
         )
 
 
 # =========================================================
-# MORE ABOUT SICKLESCAN
+# ABOUT
 # =========================================================
 
 st.markdown(
-    '<div class="section-title">'
-    'ℹ️ More About SickleScan'
-    '</div>',
+    "<div class='section-heading'>About SickleScan</div>",
     unsafe_allow_html=True
 )
 
-
 with st.expander(
-    "View project and model information"
+    "ℹ️ View project and model information"
 ):
 
     st.markdown(
@@ -1300,7 +1277,7 @@ with st.expander(
 **SickleScan** is an academic deep-learning research
 prototype designed for blood-smear image classification.
 
-### Model Information
+### Model
 
 - **Architecture:** InceptionV3
 - **Task:** Normal vs Sickle Cell
@@ -1310,21 +1287,14 @@ prototype designed for blood-smear image classification.
 
 ### Prediction
 
-The uploaded image is resized to the model's required
-input size and passed through the trained InceptionV3 model.
-The output probability is used to classify the image as
-Normal or Sickle Cell.
+The uploaded image is resized to 224 × 224 pixels
+and passed through the trained InceptionV3 model.
 
-### Explainability
+### Important
 
-Grad-CAM is used to visualize regions of the image that
-contributed to the model's prediction.
-
-### ⚠️ Important
-
-SickleScan is an academic research prototype. Its output
-should not be used as a substitute for professional medical
-diagnosis.
+SickleScan is an academic research prototype.
+Its output should **not** be used as a substitute
+for professional medical diagnosis.
 """
     )
 
@@ -1335,15 +1305,16 @@ diagnosis.
 
 st.markdown(
     """
-<div class="footer">
+    <div class="footer">
 
-🩸 <b>SICKLESCAN</b><br>
+        🩸 <b>SICKLESCAN</b><br><br>
 
-AI-Powered Blood Smear Analysis<br><br>
+        AI-Powered Blood Smear Analysis<br>
 
-Deep Learning Research Project • InceptionV3 • Grad-CAM
+        Deep Learning Research Project •
+        InceptionV3 • Grad-CAM
 
-</div>
-""",
+    </div>
+    """,
     unsafe_allow_html=True
 )
