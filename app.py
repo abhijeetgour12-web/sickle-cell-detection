@@ -45,8 +45,6 @@ st.markdown("""
     padding-bottom: 50px;
 }
 
-/* Header */
-
 .logo {
     font-size: 20px;
     font-weight: 800;
@@ -56,8 +54,6 @@ st.markdown("""
 .logo span {
     color: #c084fc;
 }
-
-/* Hero */
 
 .hero {
     text-align: center;
@@ -86,16 +82,12 @@ st.markdown("""
     line-height: 1.6;
 }
 
-/* Section */
-
 .section-title {
     font-size: 28px;
     font-weight: 800;
     margin-top: 38px;
     margin-bottom: 15px;
 }
-
-/* Information cards */
 
 .info-card {
     background: rgba(24, 27, 40, 0.78);
@@ -114,16 +106,12 @@ st.markdown("""
     line-height: 1.55;
 }
 
-/* Upload */
-
 .upload-card {
     background: rgba(24,27,40,0.85);
     border: 1px solid rgba(192,132,252,0.22);
     border-radius: 22px;
     padding: 24px;
 }
-
-/* Result */
 
 .result-normal {
     background: rgba(34,197,94,0.10);
@@ -157,8 +145,6 @@ st.markdown("""
     margin-top: 6px;
 }
 
-/* Footer */
-
 .footer {
     text-align: center;
     color: #71717a;
@@ -168,8 +154,328 @@ st.markdown("""
     border-top: 1px solid rgba(255,255,255,0.06);
 }
 
+.auth-wrap {
+    max-width: 460px;
+    margin: 75px auto 0;
+    padding: 38px 38px 34px;
+    background: rgba(20, 23, 35, 0.92);
+    border: 1px solid rgba(192,132,252,0.20);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+
+.auth-brand {
+    text-align: center;
+    font-size: 25px;
+    font-weight: 850;
+    letter-spacing: 1.5px;
+}
+
+.auth-brand span {
+    color: #c084fc;
+}
+
+.auth-title {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 800;
+    margin-top: 12px;
+    margin-bottom: 6px;
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: #a1a1aa;
+    margin-bottom: 28px;
+}
+
+.auth-note {
+    text-align: center;
+    color: #71717a;
+    font-size: 12px;
+    margin-top: 18px;
+}
+
 </style>
 """, unsafe_allow_html=True)
+
+# =========================================================
+# SUPABASE AUTHENTICATION
+# =========================================================
+
+SUPABASE_URL = st.secrets["SUPABASE_URL"]
+SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+
+
+def supabase_headers():
+    return {
+        "apikey": SUPABASE_KEY,
+        "Content-Type": "application/json"
+    }
+
+
+def signup_user(email, password):
+    return requests.post(
+        f"{SUPABASE_URL}/auth/v1/signup",
+        headers=supabase_headers(),
+        json={
+            "email": email,
+            "password": password
+        },
+        timeout=30
+    )
+
+
+def login_user(email, password):
+    return requests.post(
+        f"{SUPABASE_URL}/auth/v1/token?grant_type=password",
+        headers=supabase_headers(),
+        json={
+            "email": email,
+            "password": password
+        },
+        timeout=30
+    )
+
+
+def logout_user():
+
+    for key in [
+        "authenticated",
+        "user_email",
+        "access_token",
+        "refresh_token"
+    ]:
+        st.session_state.pop(key, None)
+
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+
+# =========================================================
+# LOGIN PAGE
+# =========================================================
+
+if not st.session_state.authenticated:
+
+    st.markdown("""
+    <div class="auth-wrap">
+
+        <div class="auth-brand">
+            🩸 <span>SICKLESCAN</span>
+        </div>
+
+        <div class="auth-title">
+            Welcome back
+        </div>
+
+        <div class="auth-subtitle">
+            Sign in to continue to SickleScan
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    login_tab, signup_tab = st.tabs(
+        ["Login", "Create account"]
+    )
+
+    # =====================================================
+    # LOGIN
+    # =====================================================
+
+    with login_tab:
+
+        with st.form("login_form"):
+
+            email = st.text_input(
+                "Email",
+                placeholder="you@example.com"
+            )
+
+            password = st.text_input(
+                "Password",
+                type="password",
+                placeholder="Enter your password"
+            )
+
+            submitted = st.form_submit_button(
+                "Login",
+                use_container_width=True
+            )
+
+        if submitted:
+
+            if not email or not password:
+
+                st.error(
+                    "Please enter your email and password."
+                )
+
+            else:
+
+                try:
+
+                    response = login_user(
+                        email.strip(),
+                        password
+                    )
+
+                    if response.ok:
+
+                        data = response.json()
+
+                        st.session_state.authenticated = True
+
+                        st.session_state.user_email = email.strip()
+
+                        st.session_state.access_token = data.get(
+                            "access_token"
+                        )
+
+                        st.session_state.refresh_token = data.get(
+                            "refresh_token"
+                        )
+
+                        st.rerun()
+
+                    else:
+
+                        payload = response.json()
+
+                        message = (
+                            payload.get("msg")
+                            or payload.get("error_description")
+                            or "Invalid email or password."
+                        )
+
+                        st.error(message)
+
+                except requests.RequestException:
+
+                    st.error(
+                        "Unable to connect to the authentication service. "
+                        "Please try again."
+                    )
+
+    # =====================================================
+    # SIGN UP
+    # =====================================================
+
+    with signup_tab:
+
+        with st.form("signup_form"):
+
+            new_email = st.text_input(
+                "Email",
+                placeholder="you@example.com",
+                key="signup_email"
+            )
+
+            new_password = st.text_input(
+                "Password",
+                type="password",
+                placeholder="Minimum 6 characters",
+                key="signup_password"
+            )
+
+            confirm_password = st.text_input(
+                "Confirm password",
+                type="password",
+                placeholder="Re-enter your password",
+                key="confirm_password"
+            )
+
+            signup_submitted = st.form_submit_button(
+                "Create account",
+                use_container_width=True
+            )
+
+        if signup_submitted:
+
+            if not new_email or not new_password or not confirm_password:
+
+                st.error(
+                    "Please fill in all fields."
+                )
+
+            elif len(new_password) < 6:
+
+                st.error(
+                    "Password must be at least 6 characters."
+                )
+
+            elif new_password != confirm_password:
+
+                st.error(
+                    "Passwords do not match."
+                )
+
+            else:
+
+                try:
+
+                    response = signup_user(
+                        new_email.strip(),
+                        new_password
+                    )
+
+                    if response.ok:
+
+                        data = response.json()
+
+                        if data.get("access_token"):
+
+                            st.session_state.authenticated = True
+
+                            st.session_state.user_email = new_email.strip()
+
+                            st.session_state.access_token = data.get(
+                                "access_token"
+                            )
+
+                            st.session_state.refresh_token = data.get(
+                                "refresh_token"
+                            )
+
+                            st.rerun()
+
+                        else:
+
+                            st.success(
+                                "Account created successfully. "
+                                "Check your email to confirm your account, "
+                                "then log in."
+                            )
+
+                    else:
+
+                        payload = response.json()
+
+                        message = (
+                            payload.get("msg")
+                            or payload.get("error_description")
+                            or "Could not create the account."
+                        )
+
+                        st.error(message)
+
+                except requests.RequestException:
+
+                    st.error(
+                        "Unable to connect to the authentication service. "
+                        "Please try again."
+                    )
+
+    st.markdown(
+        '<div class="auth-note">'
+        'Secure authentication powered by Supabase'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    st.stop()
 
 
 # =========================================================
@@ -235,6 +541,7 @@ def make_gradcam(image_array):
             if len(layer.output.shape) == 4:
 
                 target_layer = layer
+
                 break
 
         except:
@@ -306,9 +613,34 @@ def make_gradcam(image_array):
 # HEADER
 # =========================================================
 
-st.markdown(
-    '<div class="logo">🩸 <span>SICKLESCAN</span></div>',
-    unsafe_allow_html=True
+header_col1, header_col2 = st.columns(
+    [8, 1]
+)
+
+with header_col1:
+
+    st.markdown(
+        '<div class="logo">'
+        '🩸 <span>SICKLESCAN</span>'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+with header_col2:
+
+    if st.button(
+        "Logout",
+        use_container_width=True
+    ):
+
+        logout_user()
+
+        st.rerun()
+
+
+st.caption(
+    f"Signed in as "
+    f"{st.session_state.get('user_email', '')}"
 )
 
 
@@ -465,7 +797,6 @@ if uploaded_file is not None:
         uploaded_file
     ).convert("RGB")
 
-    # Same preprocessing used during training
     resized = image.resize(
         (224, 224)
     )
@@ -479,9 +810,10 @@ if uploaded_file is not None:
         axis=0
     )
 
-    # -----------------------------------------------------
+
+    # =====================================================
     # PREDICTION
-    # -----------------------------------------------------
+    # =====================================================
 
     with st.spinner(
         "🧠 AI is analyzing the image..."
@@ -497,9 +829,9 @@ if uploaded_file is not None:
     normal_probability = 1 - probability
 
 
-    # -----------------------------------------------------
+    # =====================================================
     # RESULT
-    # -----------------------------------------------------
+    # =====================================================
 
     st.markdown(
         '<div class="section-title">'
@@ -524,7 +856,9 @@ if uploaded_file is not None:
             unsafe_allow_html=True
         )
 
-        st.write("Model prediction")
+        st.write(
+            "Model prediction"
+        )
 
         st.markdown(
             '<div class="result-score">'
@@ -561,7 +895,9 @@ if uploaded_file is not None:
             unsafe_allow_html=True
         )
 
-        st.write("Model prediction")
+        st.write(
+            "Model prediction"
+        )
 
         st.markdown(
             '<div class="result-score">'
@@ -583,17 +919,21 @@ if uploaded_file is not None:
         )
 
 
-    # -----------------------------------------------------
+    # =====================================================
     # PROBABILITY
-    # -----------------------------------------------------
+    # =====================================================
 
-    st.markdown("### Prediction Breakdown")
+    st.markdown(
+        "### Prediction Breakdown"
+    )
 
     col1, col2 = st.columns(2)
 
     with col1:
 
-        st.write("🟢 **Normal Probability**")
+        st.write(
+            "🟢 **Normal Probability**"
+        )
 
         st.progress(
             float(normal_probability)
@@ -605,7 +945,9 @@ if uploaded_file is not None:
 
     with col2:
 
-        st.write("🔴 **Sickle Cell Probability**")
+        st.write(
+            "🔴 **Sickle Cell Probability**"
+        )
 
         st.progress(
             float(probability)
@@ -616,9 +958,9 @@ if uploaded_file is not None:
         )
 
 
-    # -----------------------------------------------------
+    # =====================================================
     # GRAD-CAM
-    # -----------------------------------------------------
+    # =====================================================
 
     st.markdown(
         '<div class="section-title">'
@@ -703,37 +1045,37 @@ with st.expander(
 ):
 
     st.markdown("""
-### About the Project
+    ### About the Project
 
-**SickleScan** is an academic deep-learning research
-prototype designed for blood-smear image classification.
+    **SickleScan** is an academic deep-learning research
+    prototype designed for blood-smear image classification.
 
-### Model Information
+    ### Model Information
 
-- **Architecture:** InceptionV3
-- **Task:** Normal vs Sickle Cell
-- **Input:** RGB blood-smear image
-- **Input Size:** 224 × 224 pixels
-- **Explainability:** Grad-CAM
+    - **Architecture:** InceptionV3
+    - **Task:** Normal vs Sickle Cell
+    - **Input:** RGB blood-smear image
+    - **Input Size:** 224 × 224 pixels
+    - **Explainability:** Grad-CAM
 
-### Prediction
+    ### Prediction
 
-The uploaded image is resized to the model's required
-input size and passed through the trained InceptionV3 model.
-The output probability is used to classify the image as
-Normal or Sickle Cell.
+    The uploaded image is resized to the model's required
+    input size and passed through the trained InceptionV3 model.
+    The output probability is used to classify the image as
+    Normal or Sickle Cell.
 
-### Explainability
+    ### Explainability
 
-Grad-CAM is used to visualize regions of the image that
-contributed to the model's prediction.
+    Grad-CAM is used to visualize regions of the image that
+    contributed to the model's prediction.
 
-### ⚠️ Important
+    ### ⚠️ Important
 
-SickleScan is an academic research prototype. Its output
-should not be used as a substitute for professional medical
-diagnosis.
-""")
+    SickleScan is an academic research prototype. Its output
+    should not be used as a substitute for professional medical
+    diagnosis.
+    """)
 
 
 # =========================================================
