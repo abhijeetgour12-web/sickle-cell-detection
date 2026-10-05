@@ -13,12 +13,11 @@ import os
 st.set_page_config(
     page_title="SickleScan",
     page_icon="🩸",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 
 # =========================================================
-# CUSTOM CSS
+# CUSTOM STYLE
 # =========================================================
 
 st.markdown("""
@@ -26,146 +25,95 @@ st.markdown("""
 
 .stApp {
     background:
-        radial-gradient(
-            circle at 10% 10%,
-            rgba(124, 58, 237, 0.18),
-            transparent 30%
-        ),
-        radial-gradient(
-            circle at 90% 10%,
-            rgba(219, 39, 119, 0.15),
-            transparent 28%
-        ),
+        radial-gradient(circle at 5% 5%, rgba(124,58,237,.18), transparent 30%),
+        radial-gradient(circle at 95% 5%, rgba(219,39,119,.14), transparent 30%),
         #080a12;
 }
 
 .block-container {
-    max-width: 1100px;
+    max-width: 1150px;
     padding-top: 25px;
     padding-bottom: 50px;
 }
 
-/* Top logo */
+/* Headings */
 
-.logo {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: 1px;
+h1 {
+    font-weight: 850 !important;
 }
 
-.logo span {
-    color: #c084fc;
+h2, h3 {
+    font-weight: 750 !important;
 }
 
 /* Hero */
 
-.hero {
+.hero-text {
     text-align: center;
-    padding: 55px 10px 35px;
+    padding: 35px 10px 20px;
 }
 
-.hero h1 {
-    font-size: 58px;
-    font-weight: 850;
-    margin-bottom: 10px;
-    background: linear-gradient(
-        90deg,
-        #ffffff,
-        #c084fc,
-        #f9a8d4
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.hero p {
+.hero-subtitle {
     color: #a1a1aa;
     font-size: 18px;
+    line-height: 1.6;
 }
 
-/* Small badge */
+/* Info cards */
 
-.badge {
-    display: inline-block;
-    padding: 7px 15px;
-    border-radius: 30px;
-    background: rgba(168, 85, 247, 0.12);
-    border: 1px solid rgba(192, 132, 252, 0.25);
-    color: #d8b4fe;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-/* Feature cards */
-
-.feature-card {
-    background: rgba(24, 27, 40, 0.8);
-    border: 1px solid rgba(255,255,255,0.07);
+.info-card {
+    background: rgba(24,27,40,.75);
+    border: 1px solid rgba(255,255,255,.08);
     border-radius: 18px;
-    padding: 20px;
-    text-align: center;
+    padding: 22px;
+    min-height: 155px;
 }
 
-.feature-icon {
-    font-size: 28px;
-}
-
-.feature-title {
-    font-weight: 700;
-    margin-top: 8px;
-}
-
-.feature-text {
-    color: #8f93a1;
-    font-size: 13px;
+.info-card h3 {
     margin-top: 5px;
 }
 
-/* Section headings */
-
-.section-title {
-    font-size: 27px;
-    font-weight: 800;
-    margin-top: 40px;
-    margin-bottom: 15px;
-}
-
-/* Result */
-
-.result-positive {
-    border: 1px solid rgba(248, 113, 113, 0.4);
-    background: rgba(127, 29, 29, 0.18);
-    border-radius: 20px;
-    padding: 25px;
-    text-align: center;
-}
-
-.result-negative {
-    border: 1px solid rgba(74, 222, 128, 0.35);
-    background: rgba(20, 83, 45, 0.16);
-    border-radius: 20px;
-    padding: 25px;
-    text-align: center;
-}
-
-.result-icon {
-    font-size: 42px;
-}
-
-.result-name {
-    font-size: 30px;
-    font-weight: 800;
-}
-
-.result-label {
+.info-card p {
     color: #a1a1aa;
-    margin-top: 5px;
+    line-height: 1.5;
+}
+
+/* Upload area */
+
+.upload-box {
+    background: rgba(24,27,40,.85);
+    border: 1px solid rgba(192,132,252,.22);
+    border-radius: 22px;
+    padding: 25px;
+}
+
+/* Result boxes */
+
+.result-normal {
+    background: rgba(34,197,94,.10);
+    border: 1px solid rgba(74,222,128,.30);
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+}
+
+.result-sickle {
+    background: rgba(239,68,68,.10);
+    border: 1px solid rgba(248,113,113,.35);
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+}
+
+.big-result {
+    font-size: 32px;
+    font-weight: 800;
 }
 
 .result-score {
     font-size: 36px;
     font-weight: 850;
-    margin-top: 3px;
+    margin-top: 8px;
 }
 
 /* Footer */
@@ -176,7 +124,7 @@ st.markdown("""
     font-size: 13px;
     margin-top: 50px;
     padding-top: 25px;
-    border-top: 1px solid rgba(255,255,255,0.06);
+    border-top: 1px solid rgba(255,255,255,.06);
 }
 
 </style>
@@ -184,7 +132,7 @@ st.markdown("""
 
 
 # =========================================================
-# MODEL LOADING
+# LOAD MODEL
 # =========================================================
 
 @st.cache_resource
@@ -217,9 +165,7 @@ def load_model():
                 if chunk:
                     f.write(chunk)
 
-    return tf.keras.models.load_model(
-        model_path
-    )
+    return tf.keras.models.load_model(model_path)
 
 
 model = load_model()
@@ -231,27 +177,17 @@ model = load_model()
 
 def make_gradcam(image_array):
 
-    backbone = model.get_layer(
-        "inception_v3"
-    )
+    backbone = model.get_layer("inception_v3")
 
     target_layer = None
 
-    for layer in reversed(
-        backbone.layers
-    ):
+    for layer in reversed(backbone.layers):
 
         try:
-
-            shape = layer.output.shape
-
-            if len(shape) == 4:
-
+            if len(layer.output.shape) == 4:
                 target_layer = layer
                 break
-
         except:
-
             continue
 
     grad_model = tf.keras.Model(
@@ -275,10 +211,7 @@ def make_gradcam(image_array):
 
         x = model.get_layer(
             "dropout"
-        )(
-            x,
-            training=False
-        )
+        )(x, training=False)
 
         prediction = model.get_layer(
             "dense"
@@ -309,8 +242,7 @@ def make_gradcam(image_array):
     )
 
     heatmap /= (
-        tf.reduce_max(heatmap)
-        + 1e-8
+        tf.reduce_max(heatmap) + 1e-8
     )
 
     return heatmap.numpy()
@@ -320,88 +252,131 @@ def make_gradcam(image_array):
 # HEADER
 # =========================================================
 
-st.markdown(
-    '<div class="logo">🩸 <span>SICKLESCAN</span></div>',
-    unsafe_allow_html=True
+st.markdown("## 🩸 SICKLESCAN")
+
+st.markdown("""
+<div class="hero-text">
+
+<h1>AI-Powered Blood Smear Analysis</h1>
+
+<p class="hero-subtitle">
+Explore how deep learning can be used to analyze blood-smear
+images and classify them as Normal or Sickle Cell.
+</p>
+
+</div>
+""", unsafe_allow_html=True)
+
+
+# =========================================================
+# ABOUT SICKLE CELL
+# =========================================================
+
+st.markdown("## 🩸 What is Sickle Cell Disease?")
+
+st.write(
+    """
+Sickle Cell Disease (SCD) is a genetic blood disorder in which
+red blood cells can develop an abnormal sickle-like shape.
+These changes can affect the normal movement of blood through
+blood vessels.
+
+Blood-smear images provide visual information about the
+appearance of red blood cells. Deep-learning models can be
+trained to identify visual patterns within these images.
+"""
 )
 
 
 # =========================================================
-# HERO
+# WHAT SICKLESCAN DOES
 # =========================================================
 
-st.markdown(
-    '<div class="hero">'
-    '<div class="badge">✦ AI-POWERED BLOOD SMEAR ANALYSIS</div>'
-    '<h1>See What AI Sees.</h1>'
-    '<p>'
-    'Explore AI-based blood-smear classification '
-    'with visual model explanation.'
-    '</p>'
-    '</div>',
-    unsafe_allow_html=True
-)
-
-
-# =========================================================
-# FEATURES
-# =========================================================
+st.markdown("## ✨ What SickleScan Does")
 
 c1, c2, c3 = st.columns(3)
 
 with c1:
 
-    st.markdown(
-        '<div class="feature-card">'
-        '<div class="feature-icon">🧠</div>'
-        '<div class="feature-title">Deep Learning</div>'
-        '<div class="feature-text">'
-        'Powered by InceptionV3'
-        '</div>'
-        '</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div class="info-card">
+
+    <h3>🔬 Image Analysis</h3>
+
+    <p>
+    Upload a blood-smear image and let the trained
+    deep-learning model analyze its visual features.
+    </p>
+
+    </div>
+    """, unsafe_allow_html=True)
+
 
 with c2:
 
-    st.markdown(
-        '<div class="feature-card">'
-        '<div class="feature-icon">⚡</div>'
-        '<div class="feature-title">Quick Analysis</div>'
-        '<div class="feature-text">'
-        'Prediction within seconds'
-        '</div>'
-        '</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div class="info-card">
+
+    <h3>🧠 AI Classification</h3>
+
+    <p>
+    The InceptionV3 model generates a prediction for
+    Normal or Sickle Cell along with a probability score.
+    </p>
+
+    </div>
+    """, unsafe_allow_html=True)
+
 
 with c3:
 
-    st.markdown(
-        '<div class="feature-card">'
-        '<div class="feature-icon">🔍</div>'
-        '<div class="feature-title">AI Explanation</div>'
-        '<div class="feature-text">'
-        'Visualized using Grad-CAM'
-        '</div>'
-        '</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div class="info-card">
+
+    <h3>🔥 Visual Explanation</h3>
+
+    <p>
+    Grad-CAM highlights image regions that contributed
+    to the model's prediction.
+    </p>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# =========================================================
+# MODEL PIPELINE
+# =========================================================
+
+st.markdown("## ⚙️ About the AI Model")
+
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.metric("Architecture", "InceptionV3")
+
+with col2:
+    st.metric("Input", "224 × 224")
+
+with col3:
+    st.metric("Task", "Binary")
+
+with col4:
+    st.metric("Explainability", "Grad-CAM")
 
 
 # =========================================================
 # UPLOAD
 # =========================================================
 
-st.markdown(
-    '<div class="section-title">'
-    'Analyze Your Image'
-    '</div>',
-    unsafe_allow_html=True
+st.markdown("## 🔬 Analyze a Blood-Smear Image")
+
+st.write(
+    "Upload an image below to start the AI analysis."
 )
 
 uploaded_file = st.file_uploader(
-    "Upload a blood-smear image",
+    "Choose a blood-smear image",
     type=[
         "jpg",
         "jpeg",
@@ -413,7 +388,7 @@ uploaded_file = st.file_uploader(
 
 
 # =========================================================
-# ANALYSIS
+# PREDICTION
 # =========================================================
 
 if uploaded_file is not None:
@@ -422,7 +397,7 @@ if uploaded_file is not None:
         uploaded_file
     ).convert("RGB")
 
-    # Same preprocessing as training
+    # Same preprocessing used during training
     resized = image.resize(
         (224, 224)
     )
@@ -436,12 +411,8 @@ if uploaded_file is not None:
         axis=0
     )
 
-    # -----------------------------------------------------
-    # MODEL PREDICTION
-    # -----------------------------------------------------
-
     with st.spinner(
-        "🧠 Analyzing your image..."
+        "🧠 AI is analyzing the image..."
     ):
 
         probability = float(
@@ -453,117 +424,108 @@ if uploaded_file is not None:
 
     normal_probability = 1 - probability
 
-    # -----------------------------------------------------
-    # RESULT
-    # -----------------------------------------------------
 
-    st.markdown(
-        '<div class="section-title">'
-        'Your Result'
-        '</div>',
-        unsafe_allow_html=True
-    )
+    # =====================================================
+    # RESULT
+    # =====================================================
+
+    st.markdown("## 📊 Analysis Result")
 
     if probability >= 0.5:
 
-        result = "Sickle Cell"
         confidence = probability * 100
 
         st.markdown(
-            '<div class="result-positive">'
-            '<div class="result-icon">🔴</div>'
-            '<div class="result-name">'
-            'Sickle Cell'
-            '</div>'
-            '<div class="result-label">'
-            'Model prediction'
-            '</div>'
-            '<div class="result-score">'
-            f'{confidence:.1f}%'
-            '</div>'
-            '<div class="result-label">'
-            'prediction score'
-            '</div>'
-            '</div>',
+            '<div class="result-sickle">',
             unsafe_allow_html=True
         )
+
+        st.markdown("### 🔴 Sickle Cell")
+
+        st.write("Model prediction")
+
+        st.markdown(
+            f'<div class="result-score">'
+            f'{confidence:.1f}%'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+        st.caption("Prediction score")
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     else:
 
-        result = "Normal"
         confidence = normal_probability * 100
 
         st.markdown(
-            '<div class="result-negative">'
-            '<div class="result-icon">🟢</div>'
-            '<div class="result-name">'
-            'Normal'
-            '</div>'
-            '<div class="result-label">'
-            'Model prediction'
-            '</div>'
-            '<div class="result-score">'
-            f'{confidence:.1f}%'
-            '</div>'
-            '<div class="result-label">'
-            'prediction score'
-            '</div>'
-            '</div>',
+            '<div class="result-normal">',
             unsafe_allow_html=True
         )
 
+        st.markdown("### 🟢 Normal")
 
-    # -----------------------------------------------------
+        st.write("Model prediction")
+
+        st.markdown(
+            f'<div class="result-score">'
+            f'{confidence:.1f}%'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+        st.caption("Prediction score")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
+    # =====================================================
     # PROBABILITY
-    # -----------------------------------------------------
+    # =====================================================
 
-    st.markdown(
-        '<div class="section-title">'
-        'Prediction Breakdown'
-        '</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown("### Prediction Breakdown")
 
-    col1, col2 = st.columns(2)
+    p1, p2 = st.columns(2)
 
-    with col1:
+    with p1:
 
-        st.write("🟢 **Normal**")
+        st.write("🟢 **Normal Probability**")
 
         st.progress(
             float(normal_probability)
         )
 
-        st.caption(
+        st.write(
             f"{normal_probability * 100:.1f}%"
         )
 
-    with col2:
+    with p2:
 
-        st.write("🔴 **Sickle Cell**")
+        st.write("🔴 **Sickle Cell Probability**")
 
         st.progress(
             float(probability)
         )
 
-        st.caption(
+        st.write(
             f"{probability * 100:.1f}%"
         )
 
 
-    # -----------------------------------------------------
-    # IMAGE PREVIEW
-    # -----------------------------------------------------
+    # =====================================================
+    # IMAGE + GRAD CAM
+    # =====================================================
 
-    st.markdown(
-        '<div class="section-title">'
-        'AI Explanation'
-        '</div>',
-        unsafe_allow_html=True
+    st.markdown("## 🔥 Model Explanation")
+
+    st.write(
+        "Grad-CAM provides a visual indication of the regions "
+        "that influenced the model's prediction."
     )
 
     with st.spinner(
-        "🔥 Generating Grad-CAM..."
+        "Generating Grad-CAM..."
     ):
 
         heatmap = make_gradcam(
@@ -574,9 +536,7 @@ if uploaded_file is not None:
 
     with col1:
 
-        st.subheader(
-            "🖼️ Original Image"
-        )
+        st.subheader("Original Image")
 
         st.image(
             image,
@@ -585,17 +545,13 @@ if uploaded_file is not None:
 
     with col2:
 
-        st.subheader(
-            "🔥 Grad-CAM"
-        )
+        st.subheader("Grad-CAM Visualization")
 
         fig, ax = plt.subplots(
             figsize=(7, 5)
         )
 
-        ax.imshow(
-            image
-        )
+        ax.imshow(image)
 
         ax.imshow(
             heatmap,
@@ -616,67 +572,51 @@ if uploaded_file is not None:
             clear_figure=True
         )
 
-    st.info(
-        "Grad-CAM highlights regions that contributed "
-        "to the model's prediction."
-    )
-
 
 # =========================================================
-# MORE ABOUT
+# MORE INFORMATION
 # =========================================================
 
-st.markdown(
-    '<div class="section-title">'
-    'More'
-    '</div>',
-    unsafe_allow_html=True
-)
+st.markdown("## ℹ️ More About SickleScan")
 
 with st.expander(
-    "ℹ️  More about SickleScan"
+    "View model and project information"
 ):
 
-    st.markdown("""
-### About SickleScan
+    st.write(
+        """
+        **SickleScan** is an academic deep-learning research
+        prototype for blood-smear image classification.
 
-SickleScan is an academic deep-learning research
-prototype for blood-smear image classification.
+        **Model:** InceptionV3
 
-### Model
+        **Classification:** Normal vs Sickle Cell
 
-- **Architecture:** InceptionV3
-- **Task:** Normal vs Sickle Cell
-- **Input:** RGB blood-smear image
-- **Input size:** 224 × 224 pixels
-- **Explainability:** Grad-CAM
+        **Input:** RGB blood-smear image resized to 224 × 224 pixels
 
-### How the prediction works
+        **Explainability:** Grad-CAM
 
-The uploaded image is resized to the model's required
-input size and processed by the trained InceptionV3 model.
+        **Purpose:** Academic and research demonstration
+        """
+    )
 
-The model generates a probability for the Sickle Cell
-class. Grad-CAM is then used to visualize image regions
-that contributed to the prediction.
-
-### ⚠️ Important
-
-This is an academic research prototype. The output
-should not be used as a substitute for professional
-medical diagnosis.
-""")
+    st.warning(
+        "This system is a research prototype and should not "
+        "be used as a substitute for professional medical diagnosis."
+    )
 
 
 # =========================================================
 # FOOTER
 # =========================================================
 
-st.markdown(
-    '<div class="footer">'
-    '🩸 SICKLESCAN<br>'
-    'AI-powered Blood Smear Analysis<br><br>'
-    'Deep Learning Research Project • InceptionV3 • Grad-CAM'
-    '</div>',
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div class="footer">
+
+🩸 <b>SICKLESCAN</b><br>
+AI-Powered Blood Smear Analysis<br><br>
+
+Deep Learning Research Project • InceptionV3 • Grad-CAM
+
+</div>
+""", unsafe_allow_html=True)
